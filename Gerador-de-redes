@@ -1,0 +1,248 @@
+import networkx as nx
+import plotly.graph_objects as go
+import community as community_louvain
+
+# Inicializar a rede
+G = nx.DiGraph()
+
+# Adicionar nós de autores
+authors = [
+    "Philip Kotler", "David Aaker", "Seth Godin", "Theodore Levitt", "Jay Conrad Levinson",
+    "Al Ries", "Jack Trout", "Michael Porter", "Kevin Lane Keller", "Brian Tracy",
+    "Peter Drucker", "Simon Sinek", "Gary Vaynerchuk", "Chris Anderson", "Clayton Christensen",
+    "W. Chan Kim", "Renée Mauborgne", "Byron Sharp", "Russell S. Winer", "Scott Galloway",
+    "Ries and Trout", "Malcolm Gladwell", "Daniel Kahneman", "Robert Cialdini",
+    "Joseph Pine", "James H. Gilmore", "Kotler and Keller", "Hermawan Kartajaya",
+    "Iwan Setiawan", "Gerry McGovern", "Philip Sheldrake", "Ann Handley",
+    "Joe Pulizzi", "Mark Schaefer", "Jay Baer", "David Meerman Scott", "Brian Solis",
+    "Rand Fishkin", "Neil Patel", "Larry Kim", "Mari Smith", "Michael Brenner"
+]
+
+G.add_nodes_from(authors)
+
+# Conexões baseadas em influências e correntes teóricas
+edges = [
+    # Conexões de Philip Kotler
+    ("Philip Kotler", "David Aaker", "Branding Theory"),
+    ("Philip Kotler", "Kevin Lane Keller", "Marketing Management"),
+    ("Philip Kotler", "Michael Porter", "Competitive Strategy"),
+    ("Philip Kotler", "Seth Godin", "Permission Marketing"),
+    ("Philip Kotler", "Kotler and Keller", "Co-authors Marketing Management"),
+    ("Philip Kotler", "Hermawan Kartajaya", "Marketing 3.0"),
+    ("Philip Kotler", "Iwan Setiawan", "Marketing 4.0"),
+    
+    # Conexões de David Aaker
+    ("David Aaker", "Kevin Lane Keller", "Brand Equity"),
+    ("David Aaker", "Russell S. Winer", "Consumer Behavior"),
+
+    # Conexões de Seth Godin
+    ("Seth Godin", "Gary Vaynerchuk", "Digital Marketing"),
+    ("Seth Godin", "Jay Conrad Levinson", "Guerrilla Marketing"),
+    ("Seth Godin", "Chris Anderson", "Long Tail Theory"),
+    ("Seth Godin", "Gerry McGovern", "Digital Content Strategy"),
+
+    # Conexões de Theodore Levitt
+    ("Theodore Levitt", "Philip Kotler", "Marketing Myopia"),
+    ("Theodore Levitt", "Michael Porter", "Competitive Advantage"),
+
+    # Conexões de Michael Porter
+    ("Michael Porter", "W. Chan Kim", "Blue Ocean Strategy"),
+    ("Michael Porter", "Renée Mauborgne", "Blue Ocean Strategy"),
+    ("Michael Porter", "Clayton Christensen", "Disruptive Innovation"),
+    
+    # Conexões de Kevin Lane Keller
+    ("Kevin Lane Keller", "Byron Sharp", "Brand Growth"),
+
+    # Conexões de Peter Drucker
+    ("Peter Drucker", "Brian Tracy", "Sales and Personal Development"),
+    ("Peter Drucker", "Michael Porter", "Management and Strategy"),
+    
+    # Conexões de Al Ries e Jack Trout
+    ("Al Ries", "Jack Trout", "Positioning Theory"),
+    ("Ries and Trout", "Seth Godin", "Positioning in Digital Marketing"),
+    ("Ries and Trout", "Philip Kotler", "Positioning in Marketing Strategy"),
+
+    # Conexões de Malcolm Gladwell
+    ("Malcolm Gladwell", "Daniel Kahneman", "Behavioral Economics"),
+    ("Malcolm Gladwell", "Robert Cialdini", "Influence and Persuasion"),
+    
+    # Conexões de Daniel Kahneman
+    ("Daniel Kahneman", "Robert Cialdini", "Behavioral Economics"),
+    
+    # Conexões de Joseph Pine e James H. Gilmore
+    ("Joseph Pine", "James H. Gilmore", "Experience Economy"),
+    ("Joseph Pine", "Philip Kotler", "Experience Marketing"),
+    ("James H. Gilmore", "Philip Kotler", "Experience Marketing"),
+    
+    # Conexões de Ann Handley
+    ("Ann Handley", "Joe Pulizzi", "Content Marketing"),
+    ("Ann Handley", "Mark Schaefer", "Content Strategy"),
+
+    # Conexões de Joe Pulizzi
+    ("Joe Pulizzi", "Ann Handley", "Content Marketing"),
+    ("Joe Pulizzi", "David Meerman Scott", "Content Strategy"),
+
+    # Conexões de Mark Schaefer
+    ("Mark Schaefer", "Brian Solis", "Social Media Marketing"),
+    ("Mark Schaefer", "Jay Baer", "Content Marketing"),
+
+    # Conexões de Jay Baer
+    ("Jay Baer", "David Meerman Scott", "Digital Marketing"),
+    ("Jay Baer", "Larry Kim", "Paid Media Strategies"),
+
+    # Conexões de Brian Solis
+    ("Brian Solis", "Rand Fishkin", "SEO and Digital Marketing"),
+    ("Brian Solis", "Neil Patel", "Digital Marketing Strategies"),
+
+    # Conexões de Rand Fishkin
+    ("Rand Fishkin", "Neil Patel", "SEO Strategies"),
+    ("Rand Fishkin", "Larry Kim", "Search Engine Marketing"),
+
+    # Conexões de Neil Patel
+    ("Neil Patel", "Larry Kim", "Paid Search Marketing"),
+    ("Neil Patel", "Mari Smith", "Social Media Marketing"),
+
+    # Conexões de Mari Smith
+    ("Mari Smith", "Michael Brenner", "Content Marketing Strategies"),
+
+    # Conexões de Michael Brenner
+    ("Michael Brenner", "Philip Sheldrake", "Digital Influence")
+]
+
+for edge in edges:
+    G.add_edge(edge[0], edge[1], influence=edge[2])
+
+# Extraindo posições dos nós
+pos = nx.spring_layout(G)
+
+# Detectar comunidades usando o algoritmo de Louvain
+partition = community_louvain.best_partition(G.to_undirected())
+
+# Definir cores para cada comunidade manualmente
+cluster_colors = {
+    "Marketing Estratégico": "#1f78b4",
+    "Branding e Brand Equity": "#33a02c",
+    "Marketing Digital e Inovação": "#e31a1c",
+    "Blue Ocean Strategy": "#ff7f00",
+    "Posicionamento": "#6a3d9a",
+    "Gestão e Desenvolvimento Pessoal": "#b15928",
+    "Economia Comportamental e Persuasão": "#a6cee3",
+    "Experiência de Consumo": "#b2df8a",
+    "Marketing de Conteúdo": "#fb9a99",
+    "Marketing Digital e SEO": "#fdbf6f"
+}
+
+# Mapear os autores para os clusters
+cluster_mapping = {
+    "Philip Kotler": "Marketing Estratégico", "Michael Porter": "Marketing Estratégico", "Theodore Levitt": "Marketing Estratégico",
+    "David Aaker": "Branding e Brand Equity", "Kevin Lane Keller": "Branding e Brand Equity", "Byron Sharp": "Branding e Brand Equity",
+    "Seth Godin": "Marketing Digital e Inovação", "Gary Vaynerchuk": "Marketing Digital e Inovação", "Chris Anderson": "Marketing Digital e Inovação", "Clayton Christensen": "Marketing Digital e Inovação", "Gerry McGovern": "Marketing Digital e Inovação", "Jay Conrad Levinson": "Marketing Digital e Inovação",
+    "W. Chan Kim": "Blue Ocean Strategy", "Renée Mauborgne": "Blue Ocean Strategy",
+    "Al Ries": "Posicionamento", "Jack Trout": "Posicionamento", "Ries and Trout": "Posicionamento",
+    "Peter Drucker": "Gestão e Desenvolvimento Pessoal", "Brian Tracy": "Gestão e Desenvolvimento Pessoal", "Simon Sinek": "Gestão e Desenvolvimento Pessoal",
+    "Malcolm Gladwell": "Economia Comportamental e Persuasão", "Daniel Kahneman": "Economia Comportamental e Persuasão", "Robert Cialdini": "Economia Comportamental e Persuasão",
+    "Joseph Pine": "Experiência de Consumo", "James H. Gilmore": "Experiência de Consumo",
+    "Ann Handley": "Marketing de Conteúdo", "Joe Pulizzi": "Marketing de Conteúdo", "Mark Schaefer": "Marketing de Conteúdo", "Jay Baer": "Marketing de Conteúdo", "David Meerman Scott": "Marketing de Conteúdo",
+    "Rand Fishkin": "Marketing Digital e SEO", "Neil Patel": "Marketing Digital e SEO", "Larry Kim": "Marketing Digital e SEO", "Mari Smith": "Marketing Digital e SEO", "Michael Brenner": "Marketing Digital e SEO", "Philip Sheldrake": "Marketing Digital e SEO", "Brian Solis": "Marketing Digital e SEO",
+    "Russell S. Winer": "Branding e Brand Equity", "Scott Galloway": "Branding e Brand Equity", "Kotler and Keller": "Marketing Estratégico", "Hermawan Kartajaya": "Marketing Estratégico", "Iwan Setiawan": "Marketing Estratégico"
+}
+
+# Criar traços de bordas e nós
+edge_x = []
+edge_y = []
+
+for edge in G.edges():
+    x0, y0 = pos[edge[0]]
+    x1, y1 = pos[edge[1]]
+    edge_x.extend([x0, x1, None])
+    edge_y.extend([y0, y1, None])
+
+edge_trace = go.Scatter(
+    x=edge_x,
+    y=edge_y,
+    line=dict(width=0.5, color='#888'),
+    hoverinfo='none',
+    mode='lines'
+)
+
+node_x = []
+node_y = []
+node_text = []
+node_color = []
+
+for node in G.nodes():
+    x, y = pos[node]
+    node_x.append(x)
+    node_y.append(y)
+    node_text.append(node)
+    node_color.append(cluster_colors[cluster_mapping[node]])
+
+node_trace = go.Scatter(
+    x=node_x,
+    y=node_y,
+    text=node_text,
+    mode='markers+text',
+    hoverinfo='text',
+    marker=dict(
+        showscale=True,
+        color=node_color,
+        size=10,
+        colorbar=dict(
+            thickness=15,
+            title='Clusters',
+            xanchor='left',
+            titleside='right',
+            tickvals=list(cluster_colors.values()),
+            ticktext=list(cluster_colors.keys())
+        )
+    )
+)
+
+# Adicionar legenda com informações sobre os clusters
+annotations = [
+    dict(x=0.5, y=1, xref='paper', yref='paper',
+         text='Cluster de Marketing Estratégico',
+         showarrow=False, align='left'),
+    dict(x=0.6, y=0.9, xref='paper', yref='paper',
+         text='Cluster de Branding e Brand Equity',
+         showarrow=False, align='left'),
+    dict(x=0.7, y=0.8, xref='paper', yref='paper',
+         text='Cluster de Marketing Digital e Inovação',
+         showarrow=False, align='left'),
+    dict(x=0.8, y=0.7, xref='paper', yref='paper',
+         text='Cluster de Blue Ocean Strategy',
+         showarrow=False, align='left'),
+    dict(x=0.9, y=0.6, xref='paper', yref='paper',
+         text='Cluster de Posicionamento',
+         showarrow=False, align='left'),
+    dict(x=1.0, y=0.5, xref='paper', yref='paper',
+         text='Cluster de Gestão e Desenvolvimento Pessoal',
+         showarrow=False, align='left'),
+    dict(x=0.9, y=0.4, xref='paper', yref='paper',
+         text='Cluster de Economia Comportamental e Persuasão',
+         showarrow=False, align='left'),
+    dict(x=0.8, y=0.3, xref='paper', yref='paper',
+         text='Cluster de Experiência de Consumo',
+         showarrow=False, align='left'),
+    dict(x=0.7, y=0.2, xref='paper', yref='paper',
+         text='Cluster de Marketing de Conteúdo',
+         showarrow=False, align='left'),
+    dict(x=0.6, y=0.1, xref='paper', yref='paper',
+         text='Cluster de Marketing Digital e SEO',
+         showarrow=False, align='left')
+]
+
+# Plotar a figura
+fig = go.Figure(data=[edge_trace, node_trace],
+                layout=go.Layout(
+                    title='Rede de Referências de Marketing com Clusters',
+                    titlefont=dict(size=16),
+                    showlegend=False,
+                    hovermode='closest',
+                    margin=dict(b=20, l=5, r=5, t=40),
+                    xaxis=dict(showgrid=False, zeroline=False),
+                    yaxis=dict(showgrid=False, zeroline=False),
+                    annotations=annotations
+                ))
+
+fig.show()
